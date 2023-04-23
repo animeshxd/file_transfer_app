@@ -1,18 +1,21 @@
-import 'dart:io';
+import 'dart:io' as io;
 import 'dart:math';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_ui/server.dart';
 import 'package:file_ui/utils.dart';
 import 'package:flutter/material.dart';
 
+import '../model/file.dart';
 import '../widgets/adaptive_button.dart';
 
-List<PlatformFile> files = [];
+List<File> files = [];
 int port = 0;
 
 class PageForSend extends StatefulWidget {
-  const PageForSend({super.key});
+  final Server server;
+  const PageForSend({super.key, required this.server});
 
   @override
   State<PageForSend> createState() => _PageForSendState();
@@ -21,28 +24,18 @@ class PageForSend extends StatefulWidget {
 class _PageForSendState extends State<PageForSend> {
   FilePickerResult? result;
   bool _dragging = false;
-  bool _sending = false;
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-
+    var server = widget.server;
+    bool sending = server.started;
+    widget.server.files = files.asMap().map((key, value) {
+      value.id = key;
+      return MapEntry(key, value);
+    });
     return DropTarget(
-      onDragDone: (details) async {
-        for (var file in details.files) {
-          try {
-            files.add(
-              PlatformFile(
-                name: file.name,
-                size: await file.length(),
-                path: file.path,
-              ),
-            );
-          } on FileSystemException {
-            return;
-          }
-        }
-        setState(() {});
-      },
+      onDragDone: _onFileDropped,
       onDragEntered: (details) => setState(() => _dragging = true),
       onDragExited: (details) => setState(() => _dragging = false),
       child: Column(
@@ -51,32 +44,32 @@ class _PageForSendState extends State<PageForSend> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               OutlinedButton(
-                onPressed: () async {
-                  // files.clear();
-                  result =
-                      await FilePicker.platform.pickFiles(allowMultiple: true);
-                  files = result?.files ?? files;
-                  setState(() {});
-                },
+                onPressed: _selectFiles,
                 child: const Text("Select Files"),
               ),
               SizedBox(width: width * .05),
               AdaptiveOutlinedIconButton(
-                onPressed: () {
-                  port = Random().nextInt(1112) + 8888;
-                  setState(() => _sending = !_sending);
+                onPressed: () async {
+                  port = _getRandomPort;
+                  sending = server.started;
+                  if (sending) {
+                    await server.stop();
+                  } else {
+                    await server.serve(port: port);
+                  }
+                  _trySetState(() => sending = server.started);
                 },
                 icon: Icon(
-                  _sending ? Icons.stop : Icons.send,
-                  color: _sending
+                  sending ? Icons.stop : Icons.send,
+                  color: sending
                       ? Colors.redAccent
                       : Theme.of(context).primaryColor,
                 ),
-                label: Text(_sending ? 'stop' : 'start'),
-                toolTip: _sending ? 'stop' : 'start',
+                label: Text(sending ? 'stop' : 'start'),
+                toolTip: sending ? 'stop' : 'start',
               ),
               IconButton(
-                onPressed: () => setState(() => files.clear()),
+                onPressed: _clearFiles,
                 icon: const Icon(Icons.clear_all),
                 tooltip: 'clear',
               ),
@@ -86,7 +79,7 @@ class _PageForSendState extends State<PageForSend> {
             future: getPin(port),
             initialData: '',
             builder: (context, snapshot) {
-              return Text("PIN: ${!_sending ? '' : snapshot.data}");
+              return Text("PIN: ${!sending ? '' : snapshot.data}");
             },
           ),
           const SizedBox(height: 16),
@@ -103,17 +96,14 @@ class _PageForSendState extends State<PageForSend> {
                     key: Key('${file.path}'),
                     direction: DismissDirection.startToEnd,
                     onDismissed: (direction) {
-                      setState(() => files.removeAt(index));
+                      _trySetState(() => files.removeAt(index));
                     },
                     background: Container(
                       color: Colors.red,
                       alignment: Alignment.centerLeft,
                       child: const Padding(
                         padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                        child: Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
+                        child: Icon(Icons.delete, color: Colors.white),
                       ),
                     ),
                     child: ListTile(
@@ -125,11 +115,7 @@ class _PageForSendState extends State<PageForSend> {
                         "${file.path}",
                         style: const TextStyle(fontSize: 14),
                       ),
-                      trailing: StreamBuilder(
-                        builder: (context, snapshot) {
-                          return Text(file.size.H);
-                        } /*Icon(Icons.access_time)*/,
-                      ),
+                      trailing: Text(file.size.H),
                     ),
                   );
                 },
@@ -140,5 +126,53 @@ class _PageForSendState extends State<PageForSend> {
       ),
     );
   }
-}
 
+  int get _getRandomPort => Random().nextInt(1111) + 8888;
+
+  void _selectFiles() async {
+    result = await FilePicker.platform.pickFiles(allowMultiple: true);
+    files = result?.files
+            .map((e) => File(name: e.name, size: e.size, path: e.path))
+            .toList() ??
+        files;
+    widget.server.files = files.asMap().map((key, value) {
+      value.id = key;
+      return MapEntry(key, value);
+    });
+    _trySetState();
+  }
+
+  void _trySetState([VoidCallback? fn]) {
+    try {
+      setState(fn ?? () {});
+    } on Exception {
+      return;
+    }
+  }
+
+  void _onFileDropped(DropDoneDetails details) async {
+    for (var file in details.files) {
+      try {
+        files.add(
+          File(
+            name: file.name,
+            size: await file.length(),
+            path: file.path,
+          ),
+        );
+      } on io.FileSystemException {
+        return;
+      }
+    }
+    widget.server.files = files.asMap().map((key, value) {
+      value.id = key;
+      return MapEntry(key, value);
+    });
+    _trySetState();
+  }
+
+  void _clearFiles() async {
+    await FilePicker.platform.clearTemporaryFiles();
+    _trySetState(() => files.clear());
+  }
+}

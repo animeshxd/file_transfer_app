@@ -1,7 +1,10 @@
 
+import 'package:file_picker/file_picker.dart';
 import 'package:file_ui/pages/receive.dart';
 import 'package:file_ui/pages/send.dart';
 import 'package:flutter/material.dart';
+
+import 'server.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -28,8 +31,17 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int current = 0;
+  var server = Server();
 
-  var body = [const PageForSend(), const PageForReceive()];
+  @override
+  void dispose() async {
+    super.dispose();
+    server.stop();
+    
+      await FilePicker.platform.clearTemporaryFiles();
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,8 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: current,
         onTap: (value) => setState(() => current = value),
       ),
-      body: body[current],
+      body: [PageForSend(server: server), const PageForReceive()][current],
     );
   }
 }
-
