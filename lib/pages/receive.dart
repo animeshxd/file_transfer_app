@@ -89,13 +89,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                 ),
                 subtitle: Text('Size: ${file.size.H}'),
                 trailing: IconButton(
-                  onPressed: () async {
-                    var hostPort = await getHostPort(pin);
-                    var ip = hostPort.ip;
-                    var port = hostPort.port;
-                    await launchUrl(Uri.http('$ip:$port', '/file/${file.id}'),
-                        mode: LaunchMode.externalApplication);
-                  },
+                  onPressed: () => _downloadHandler(file.id),
                   icon: const Icon(Icons.download),
                 ),
               );
@@ -103,6 +97,16 @@ class _PageForReceiveState extends State<PageForReceive> {
           ),
         ),
       ],
+    );
+  }
+
+  void _downloadHandler(int? id) async {
+    var hostPort = await getHostPort(pin);
+    var ip = hostPort.ip;
+    var port = hostPort.port;
+    await launchUrl(
+      Uri.http('$ip:$port', '/file/$id'),
+      mode: LaunchMode.externalApplication,
     );
   }
 
