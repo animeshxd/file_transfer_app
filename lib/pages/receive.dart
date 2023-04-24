@@ -52,6 +52,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'enter pin',
+                    contentPadding: EdgeInsets.all(14)
                   ),
                   style: const TextStyle(fontSize: 14),
                 ),
