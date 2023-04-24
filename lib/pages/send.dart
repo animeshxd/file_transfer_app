@@ -24,6 +24,7 @@ class PageForSend extends StatefulWidget {
 class _PageForSendState extends State<PageForSend> {
   FilePickerResult? result;
   bool _dragging = false;
+  bool _loadingFile = false;
 
   @override
   Widget build(BuildContext context) {
@@ -82,6 +83,19 @@ class _PageForSendState extends State<PageForSend> {
               return Text("PIN: ${!sending ? '' : snapshot.data}");
             },
           ),
+          Visibility(
+            visible: _loadingFile,
+            child: Container(
+              width: width,
+              height: 30,
+              color: Colors.red,
+              child: const Center(
+                  child: Text(
+                "loading a big file, please wait...",
+                style: TextStyle(color: Colors.white),
+              )),
+            ),
+          ),
           const SizedBox(height: 16),
           Expanded(
             child: Container(
@@ -130,11 +144,19 @@ class _PageForSendState extends State<PageForSend> {
   int get _getRandomPort => Random().nextInt(1111) + 8888;
 
   void _selectFiles() async {
-    result = await FilePicker.platform.pickFiles(allowMultiple: true);
-    files = result?.files
-            .map((e) => File(name: e.name, size: e.size, path: e.path))
-            .toList() ??
-        files;
+    result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      onFileLoading: (status) {
+        _loadingFile = status == FilePickerStatus.picking;
+        _trySetState();
+      },
+    );
+    files.addAll(
+      result?.files
+              .map((e) => File(name: e.name, size: e.size, path: e.path))
+              .toList() ??
+          [],
+    );
     widget.server.files = files.asMap().map((key, value) {
       value.id = key;
       return MapEntry(key, value);
