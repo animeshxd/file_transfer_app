@@ -57,7 +57,6 @@ class _PageForSendState extends State<PageForSend> {
                       ? Colors.redAccent
                       : Theme.of(context).primaryColor,
                 ),
-                label: Text(_sending ? 'stop' : 'start'),
                 toolTip: _sending ? 'stop' : 'start',
               ),
               IconButton(
@@ -171,7 +170,7 @@ class _PageForSendState extends State<PageForSend> {
   void _trySetState([VoidCallback? fn]) {
     try {
       setState(fn ?? () {});
-    } on Exception {
+    } catch (e) {
       return;
     }
   }
@@ -198,7 +197,9 @@ class _PageForSendState extends State<PageForSend> {
   }
 
   void _clearFiles() async {
-    await FilePicker.platform.clearTemporaryFiles();
+    if (io.Platform.isAndroid || io.Platform.isIOS) {
+      await FilePicker.platform.clearTemporaryFiles();
+    }
     _trySetState(() => files.clear());
   }
 }

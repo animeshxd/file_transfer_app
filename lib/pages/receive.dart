@@ -1,4 +1,3 @@
-
 import 'package:file_ui/client.dart';
 import 'package:file_ui/model/file.dart';
 import 'package:file_ui/utils.dart';
@@ -52,7 +51,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     hintText: 'enter pin',
-                    contentPadding: EdgeInsets.all(14)
+                    contentPadding: EdgeInsets.all(14),
                   ),
                   style: const TextStyle(fontSize: 14),
                 ),
@@ -69,9 +68,6 @@ class _PageForReceiveState extends State<PageForReceive> {
                         ? Colors.green
                         : Theme.of(context).primaryColor,
               ),
-              label: Text(_serverFound == ServerFoundState.FOUND
-                  ? 'connected'
-                  : 'connect'),
               toolTip: _serverFound == ServerFoundState.FOUND
                   ? 'connected'
                   : 'connect',
