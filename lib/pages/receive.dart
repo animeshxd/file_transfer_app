@@ -49,6 +49,11 @@ class _PageForReceiveState extends State<PageForReceive> {
                   initialValue: pin,
                   onChanged: _onFormFieldChanged,
                   validator: _pinValidator,
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'enter pin',
+                  ),
+                  style: const TextStyle(fontSize: 14),
                 ),
               ),
             ),

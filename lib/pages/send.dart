@@ -22,15 +22,15 @@ class PageForSend extends StatefulWidget {
 }
 
 class _PageForSendState extends State<PageForSend> {
-  FilePickerResult? result;
   bool _dragging = false;
   bool _loadingFile = false;
+  bool _sending = false;
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var server = widget.server;
-    bool sending = server.started;
+    _sending = server.started;
     widget.server.files = files.asMap().map((key, value) {
       value.id = key;
       return MapEntry(key, value);
@@ -50,24 +50,15 @@ class _PageForSendState extends State<PageForSend> {
               ),
               SizedBox(width: width * .05),
               AdaptiveOutlinedIconButton(
-                onPressed: () async {
-                  port = _getRandomPort;
-                  sending = server.started;
-                  if (sending) {
-                    await server.stop();
-                  } else {
-                    await server.serve(port: port);
-                  }
-                  _trySetState(() => sending = server.started);
-                },
+                onPressed: _startOrStopServer,
                 icon: Icon(
-                  sending ? Icons.stop : Icons.send,
-                  color: sending
+                  _sending ? Icons.stop : Icons.send,
+                  color: _sending
                       ? Colors.redAccent
                       : Theme.of(context).primaryColor,
                 ),
-                label: Text(sending ? 'stop' : 'start'),
-                toolTip: sending ? 'stop' : 'start',
+                label: Text(_sending ? 'stop' : 'start'),
+                toolTip: _sending ? 'stop' : 'start',
               ),
               IconButton(
                 onPressed: _clearFiles,
@@ -80,7 +71,7 @@ class _PageForSendState extends State<PageForSend> {
             future: getPin(port),
             initialData: '',
             builder: (context, snapshot) {
-              return Text("PIN: ${!sending ? '' : snapshot.data}");
+              return Text("PIN: ${!_sending ? '' : snapshot.data}");
             },
           ),
           Visibility(
@@ -90,10 +81,11 @@ class _PageForSendState extends State<PageForSend> {
               height: 30,
               color: Colors.red,
               child: const Center(
-                  child: Text(
-                "loading a big file, please wait...",
-                style: TextStyle(color: Colors.white),
-              )),
+                child: Text(
+                  "loading a big file, please wait...",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 16),
@@ -143,8 +135,20 @@ class _PageForSendState extends State<PageForSend> {
 
   int get _getRandomPort => Random().nextInt(1111) + 8888;
 
+  void _startOrStopServer() async {
+    port = _getRandomPort;
+    var server = widget.server;
+    _sending = server.started;
+    if (_sending) {
+      await server.stop();
+    } else {
+      await server.serve(port: port);
+    }
+    _trySetState(() => _sending = server.started);
+  }
+
   void _selectFiles() async {
-    result = await FilePicker.platform.pickFiles(
+    var result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       onFileLoading: (status) {
         _loadingFile = status == FilePickerStatus.picking;
