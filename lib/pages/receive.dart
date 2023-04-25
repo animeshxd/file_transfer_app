@@ -96,7 +96,19 @@ class _PageForReceiveState extends State<PageForReceive> {
                   ),
                   subtitle: Text('Size: ${file.size.H}'),
                   trailing: IconButton(
-                    onPressed: () => _downloadHandler(file, context),
+                    onPressed: () {
+                      _downloadHandler(file);
+                      _runOnAndroid(
+                        () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text("Download Started: ${file.name}"),
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      );
+                    },
                     icon: const Icon(Icons.download),
                   ),
                 );
@@ -108,21 +120,13 @@ class _PageForReceiveState extends State<PageForReceive> {
     );
   }
 
-  void _downloadHandler(File file, BuildContext context) async {
+  void _downloadHandler(File file) async {
     var hostPort = await getHostPort(pin);
     var ip = hostPort.ip;
     var port = hostPort.port;
     var url = "http://$ip:$port/file/${file.id}";
     if (Platform.isAndroid) {
       await downloadFile(url: url, filename: file.name);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Download Started: ${file.name}"),
-          duration: const Duration(seconds: 2),
-        ),
-      );
-
       return;
     }
 
@@ -130,6 +134,10 @@ class _PageForReceiveState extends State<PageForReceive> {
       Uri.parse(url),
       mode: LaunchMode.externalApplication,
     );
+  }
+
+  void _runOnAndroid(VoidCallback fn) {
+    if (Platform.isAndroid) fn();
   }
 
   void _getFiles() async {
