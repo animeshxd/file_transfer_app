@@ -37,6 +37,7 @@ class _PageForSendState extends State<PageForSend> {
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
+    _updateServerFiles(widget.server, files);
 
     return DropTarget(
       onDragDone: _onFileDropped,
