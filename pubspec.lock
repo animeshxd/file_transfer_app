@@ -244,10 +244,11 @@ packages:
   network_info_plus:
     dependency: "direct main"
     description:
-      name: network_info_plus
-      sha256: bee3cee3893ec8dbfdf11604e8fea9284a9cd9c3387e054114e95c4f289aa9b0
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/network_info_plus/network_info_plus"
+      ref: fix_1716
+      resolved-ref: f8f2350856ff3a26b32ff87af898e2c78f728e5a
+      url: "https://github.com/animeshxd/plus_plugins"
+    source: git
     version: "3.0.3"
   network_info_plus_platform_interface:
     dependency: transitive
