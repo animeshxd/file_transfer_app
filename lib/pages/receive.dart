@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:download_manager/download_manager.dart';
 import 'package:file_ui/client.dart';
 import 'package:file_ui/model/file.dart';
 import 'package:file_ui/utils.dart';
@@ -91,7 +94,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                 ),
                 subtitle: Text('Size: ${file.size.H}'),
                 trailing: IconButton(
-                  onPressed: () => _downloadHandler(file.id),
+                  onPressed: () => _downloadHandler(file.id!, context),
                   icon: const Icon(Icons.download),
                 ),
               );
@@ -102,12 +105,27 @@ class _PageForReceiveState extends State<PageForReceive> {
     );
   }
 
-  void _downloadHandler(int? id) async {
+  void _downloadHandler(int id, BuildContext context) async {
     var hostPort = await getHostPort(pin);
     var ip = hostPort.ip;
     var port = hostPort.port;
+    var url = "http://$ip:$port/file/$id";
+    var file = files[id];
+    if (Platform.isAndroid) {
+      await downloadFile(url: url, filename: file.name);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Download Started: ${file.name}"),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+
+      return;
+    }
+
     await launchUrl(
-      Uri.http('$ip:$port', '/file/$id'),
+      Uri.parse(url),
       mode: LaunchMode.externalApplication,
     );
   }

@@ -81,6 +81,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
+  download_manager:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "7616c6250797c8b4857cce85a4c9e27eda14b099"
+      url: "https://github.com/animeshxd/download_manager_flutter.git"
+    source: git
+    version: "0.0.1"
   fake_async:
     dependency: transitive
     description:

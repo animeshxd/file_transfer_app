@@ -44,6 +44,10 @@ dependencies:
   path: ^1.8.2
   http: ^0.13.5
   url_launcher: ^6.1.10
+  download_manager:
+    git:
+      url: https://github.com/animeshxd/download_manager_flutter.git
+      ref: master
 
 dev_dependencies:
   flutter_test:
