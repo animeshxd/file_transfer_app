@@ -83,22 +83,25 @@ class _PageForReceiveState extends State<PageForReceive> {
           ],
         ),
         Expanded(
-          child: ListView.builder(
-            itemCount: files.length,
-            itemBuilder: (context, index) {
-              var file = files[index];
-              return ListTile(
-                title: Text(
-                  file.name,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                subtitle: Text('Size: ${file.size.H}'),
-                trailing: IconButton(
-                  onPressed: () => _downloadHandler(file.id!, context),
-                  icon: const Icon(Icons.download),
-                ),
-              );
-            },
+          child: RefreshIndicator(
+            onRefresh: () async => _getFiles(),
+            child: ListView.builder(
+              itemCount: files.length,
+              itemBuilder: (context, index) {
+                var file = files[index];
+                return ListTile(
+                  title: Text(
+                    file.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('Size: ${file.size.H}'),
+                  trailing: IconButton(
+                    onPressed: () => _downloadHandler(file.id!, context),
+                    icon: const Icon(Icons.download),
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ],
@@ -147,7 +150,7 @@ class _PageForReceiveState extends State<PageForReceive> {
   }
 
   String? _pinValidator(value) {
-    if (value == null || value.isEmpty) return '';
+    if (value == null || value.isEmpty) return null;
     if (value.length < 5 || !RegExp(r'\d+').hasMatch(value)) {
       return "invalid pin";
     }
@@ -157,21 +160,7 @@ class _PageForReceiveState extends State<PageForReceive> {
     return null;
   }
 
-  void _onFormSubmitted() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      var hostPort = await getHostPort(pin);
-      try {
-        files =
-            (await Client().files(hostPort.ip, hostPort.port)).values.toList();
-      } on ClientException {
-        _serverFound = ServerFoundState.FAILED;
-        _trySetState();
-        return;
-      }
-      _serverFound = ServerFoundState.FOUND;
-      _trySetState();
-    }
-  }
+  void _onFormSubmitted() async => _getFiles();
 
   void _trySetState([VoidCallback? fn]) {
     try {
