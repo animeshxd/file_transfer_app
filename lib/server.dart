@@ -12,7 +12,7 @@ class Server {
   bool started = false;
   var app = Router();
   io.HttpServer? _server;
-  Map<int, File> files = {};
+  Map<String, File> files = {};
 
   Server() {
     app
@@ -30,7 +30,7 @@ class Server {
   }
 
   Response _getFile(Request request, String id) {
-    var f = files[int.parse(id)];
+    var f = files[id];
     if (f == null) return Response.notFound('not found');
     var file = io.File(f.path!);
     var filename = p.basename(file.path);

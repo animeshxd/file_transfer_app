@@ -5,7 +5,7 @@ class File {
   final String name;
   final int size;
   String? path;
-  int? id;
+  String? id;
 
   File({required this.name, required this.size, this.path, this.id});
 

@@ -96,7 +96,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                   ),
                   subtitle: Text('Size: ${file.size.H}'),
                   trailing: IconButton(
-                    onPressed: () => _downloadHandler(file.id!, context),
+                    onPressed: () => _downloadHandler(file, context),
                     icon: const Icon(Icons.download),
                   ),
                 );
@@ -108,12 +108,11 @@ class _PageForReceiveState extends State<PageForReceive> {
     );
   }
 
-  void _downloadHandler(int id, BuildContext context) async {
+  void _downloadHandler(File file, BuildContext context) async {
     var hostPort = await getHostPort(pin);
     var ip = hostPort.ip;
     var port = hostPort.port;
-    var url = "http://$ip:$port/file/$id";
-    var file = files[id];
+    var url = "http://$ip:$port/file/${file.id}";
     if (Platform.isAndroid) {
       await downloadFile(url: url, filename: file.name);
 
@@ -150,7 +149,7 @@ class _PageForReceiveState extends State<PageForReceive> {
   }
 
   String? _pinValidator(value) {
-    if (value == null || value.isEmpty) return null;
+    if (value == null || value.isEmpty) return '';
     if (value.length < 5 || !RegExp(r'\d+').hasMatch(value)) {
       return "invalid pin";
     }

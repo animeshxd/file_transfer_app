@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_ui/server.dart';
 import 'package:file_ui/utils.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 import '../model/file.dart';
 import '../widgets/adaptive_button.dart';
@@ -27,14 +28,16 @@ class _PageForSendState extends State<PageForSend> {
   bool _sending = false;
 
   @override
+  void initState() {
+    super.initState();
+    _sending = widget.server.started;
+    _updateServerFiles(widget.server, files);
+  }
+
+  @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    var server = widget.server;
-    _sending = server.started;
-    widget.server.files = files.asMap().map((key, value) {
-      value.id = key;
-      return MapEntry(key, value);
-    });
+
     return DropTarget(
       onDragDone: _onFileDropped,
       onDragEntered: (details) => setState(() => _dragging = true),
@@ -160,11 +163,16 @@ class _PageForSendState extends State<PageForSend> {
               .toList() ??
           [],
     );
-    widget.server.files = files.asMap().map((key, value) {
-      value.id = key;
-      return MapEntry(key, value);
-    });
+    _updateServerFiles(widget.server, files);
     _trySetState();
+  }
+
+  var uuid = const Uuid();
+  void _updateServerFiles(Server server, List<File> files) {
+    server.files = files.asMap().map((key, value) {
+      value.id = uuid.v4().toString();
+      return MapEntry(value.id!, value);
+    });
   }
 
   void _trySetState([VoidCallback? fn]) {
@@ -189,10 +197,7 @@ class _PageForSendState extends State<PageForSend> {
         return;
       }
     }
-    widget.server.files = files.asMap().map((key, value) {
-      value.id = key;
-      return MapEntry(key, value);
-    });
+    _updateServerFiles(widget.server, files);
     _trySetState();
   }
 
