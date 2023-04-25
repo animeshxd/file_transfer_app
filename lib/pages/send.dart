@@ -74,7 +74,8 @@ class _PageForSendState extends State<PageForSend> {
             future: getPin(port),
             initialData: '',
             builder: (context, snapshot) {
-              return Text("PIN: ${!_sending ? '' : snapshot.data}");
+              var pin = !_sending ? '' : snapshot.data ?? 'not found';
+              return Text("PIN: $pin");
             },
           ),
           Visibility(
