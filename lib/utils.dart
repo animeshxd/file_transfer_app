@@ -1,3 +1,4 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 
 extension IntExt on int {
@@ -68,4 +69,16 @@ Future<HostPort> getHostPort(String pin) async {
     return HostPort(result.join('.'), int.parse(port));
   }
   return HostPort(ips.join('.'), int.parse(port));
+}
+
+Future<bool> checkForWifi() async {
+  var connectivityResult = await (Connectivity().checkConnectivity());
+  switch (connectivityResult) {
+    case ConnectivityResult.ethernet:
+    case ConnectivityResult.wifi:
+      return true;
+
+    default:
+      return false;
+  }
 }

@@ -1,7 +1,10 @@
+import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_ui/pages/receive.dart';
 import 'package:file_ui/pages/send.dart';
+import 'package:file_ui/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'server.dart';
@@ -33,13 +36,21 @@ class _MyHomePageState extends State<MyHomePage> {
   int current = 0;
   var server = Server();
 
+  StreamSubscription<ConnectivityResult>? connectionSubscription;
+
   @override
   void dispose() async {
     super.dispose();
     server.stop();
-    
-      await FilePicker.platform.clearTemporaryFiles();
-    
+    await FilePicker.platform.clearTemporaryFiles();
+    await connectionSubscription?.cancel();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    connectionSubscription =
+        Connectivity().onConnectivityChanged.listen((e) => setState(() {}));
   }
 
   @override
@@ -57,7 +68,29 @@ class _MyHomePageState extends State<MyHomePage> {
         currentIndex: current,
         onTap: (value) => setState(() => current = value),
       ),
-      body: [PageForSend(server: server), const PageForReceive()][current],
+      body: FutureBuilder<bool>(
+        future: checkForWifi(),
+        initialData: false,
+        builder: (context, snapshot) {
+          if (snapshot.data == false) {
+            return showAskForNetwork;
+          }
+          return [PageForSend(server: server), const PageForReceive()][current];
+        },
+      ),
+    );
+  }
+
+  Widget get showAskForNetwork {
+    return AlertDialog(
+      title: const Text("No Local Network Found"),
+      content: const Text("Please connect to Wifi or Wired Network"),
+      actions: [
+        TextButton(
+          onPressed: () => setState(() {}),
+          child: const Text("OK"),
+        )
+      ],
     );
   }
 }

@@ -49,6 +49,7 @@ dependencies:
       url: https://github.com/animeshxd/download_manager_flutter.git
       ref: master
   uuid: ^3.0.7
+  connectivity_plus: ^3.0.4
 
 dev_dependencies:
   flutter_test:
