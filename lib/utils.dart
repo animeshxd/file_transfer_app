@@ -1,5 +1,14 @@
+// ignore_for_file: constant_identifier_names, non_constant_identifier_names
+
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:network_info_windows/network_info_windows.dart';
+
+const IF_TYPE_ETHERNET_CSMACD = 6;
+const IF_TYPE_IEEE80211 = 71;
+const IfOperStatusUp = 1;
 
 extension IntExt on int {
   String get H {
@@ -11,10 +20,43 @@ extension IntExt on int {
     return '${(this / 1024).roundToDouble()}KB';
   }
 }
+
+extension ListExt<T> on List<T> {
+  T? get firstOrNull {
+    if (length == 0) {
+      return null;
+    } else {
+      return first;
+    }
+  }
+}
+
 Future<String?> getPin(int port) async {
-  final info = NetworkInfo();
-  var ip = await info.getWifiIP();
-  var gateway = await info.getWifiGatewayIP();
+  String? ip;
+  String? gateway;
+  if (Platform.isWindows) {
+    final infos = await NetworkInfoWindows().GetAdaptersInfo();
+    var info = infos.entries.where((element) {
+      var OperStatus = element.value["OperStatus"];
+      var IfType = element.value["IfType"];
+
+      if (OperStatus == IfOperStatusUp &&
+          (IfType == IF_TYPE_ETHERNET_CSMACD || IfType == IF_TYPE_IEEE80211)) {
+        return true;
+      }
+      return false;
+    }).first;
+    ip = List<String>.from(info.value["UnicastAddress"]?["AF_INET"] ?? [])
+        .firstOrNull;
+    gateway =
+        List<String>.from(info.value["GatewayAddress"]?["AF_INET"] ?? [])
+            .firstOrNull;
+  
+  } else {
+    final info = NetworkInfo();
+    ip = await info.getWifiIP();
+    gateway = await info.getWifiGatewayIP();
+  }
   if (ip == null || gateway == null) return null;
   var pin = '';
   var ip0 = ip.split('.');
@@ -24,7 +66,7 @@ Future<String?> getPin(int port) async {
       pin = ip0[i];
     }
   }
-  
+
   return "$pin$port";
 }
 

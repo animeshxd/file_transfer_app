@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   connectivity_plus
   desktop_drop
   network_info_plus
+  network_info_windows
   url_launcher_windows
 )
 

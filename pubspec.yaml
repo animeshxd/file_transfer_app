@@ -49,11 +49,12 @@ dependencies:
       ref: master
   uuid: ^3.0.7
   connectivity_plus: ^3.0.4
-  network_info_plus:
-    git:
-      url: https://github.com/animeshxd/plus_plugins
-      ref: fix_1716
-      path: packages/network_info_plus/network_info_plus
+  network_info_plus: any
+  network_info_windows: 
+    git: 
+      url: https://github.com/animeshxd/network_info_windows.git
+      ref: master
+    
 
 dev_dependencies:
   flutter_test:

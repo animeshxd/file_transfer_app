@@ -12,7 +12,7 @@ import '../model/file.dart';
 import '../widgets/adaptive_button.dart';
 
 List<File> files = [];
-int port = 0;
+String pin = "";
 
 class PageForSend extends StatefulWidget {
   final Server server;
@@ -70,14 +70,7 @@ class _PageForSendState extends State<PageForSend> {
               ),
             ],
           ),
-          FutureBuilder<String?>(
-            future: getPin(port),
-            initialData: '',
-            builder: (context, snapshot) {
-              var pin = !_sending ? '' : snapshot.data ?? 'not found';
-              return Text("PIN: $pin");
-            },
-          ),
+          Text("PIN: ${pin.isNotEmpty ? pin : "not found"}"),
           Visibility(
             visible: _loadingFile,
             child: Container(
@@ -140,12 +133,15 @@ class _PageForSendState extends State<PageForSend> {
   int get _getRandomPort => Random().nextInt(1111) + 8888;
 
   void _startOrStopServer() async {
-    port = _getRandomPort;
     var server = widget.server;
     _sending = server.started;
+    pin = "";
     if (_sending) {
       await server.stop();
     } else {
+      var port = _getRandomPort;
+      pin = (await getPin(port)) ?? "";
+      _updateServerFiles(widget.server, files);
       await server.serve(port: port);
     }
     _trySetState(() => _sending = server.started);
