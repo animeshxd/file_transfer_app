@@ -6,7 +6,10 @@ import 'model/file.dart';
 class Client {
   Future<Map<String, File>> files(String ip, int port) async {
     try {
-      var res = await http.get(Uri.http('$ip:$port', '/files'));
+      var res = await http.get(Uri.http('$ip:$port', '/files')).timeout(
+            const Duration(seconds: 1),
+            onTimeout: () => http.Response("", 404),
+          );
       if (res.statusCode == 404) return {};
       return (json.decode(res.body) as Map<String, dynamic>)
           .map((key, value) => MapEntry(key, File.fromMap(value)));
