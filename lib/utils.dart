@@ -10,6 +10,8 @@ const IF_TYPE_ETHERNET_CSMACD = 6;
 const IF_TYPE_IEEE80211 = 71;
 const IfOperStatusUp = 1;
 
+typedef VoidCallback = void Function();
+
 extension IntExt on int {
   String get H {
     if (this < 1024) return '$this B';
@@ -119,4 +121,12 @@ Future<bool> checkForWifi() async {
     default:
       return false;
   }
+}
+
+void runOnAndroid(VoidCallback fn, [VoidCallback? elseFn]) {
+  Platform.isAndroid ? fn() : elseFn?.call();
+}
+
+void runOnWindows(VoidCallback fn, [VoidCallback? elseFn]) {
+  Platform.isWindows ? fn() : elseFn?.call();
 }

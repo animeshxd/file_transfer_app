@@ -98,7 +98,7 @@ class _PageForReceiveState extends State<PageForReceive> {
                   trailing: IconButton(
                     onPressed: () {
                       _downloadHandler(file);
-                      _runOnAndroid(
+                      runOnAndroid(
                         () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -136,9 +136,6 @@ class _PageForReceiveState extends State<PageForReceive> {
     );
   }
 
-  void _runOnAndroid(VoidCallback fn) {
-    if (Platform.isAndroid) fn();
-  }
 
   void _getFiles() async {
     if (_pinValidator(pin) != null) return;
