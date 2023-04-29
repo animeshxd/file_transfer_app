@@ -40,18 +40,13 @@ Future<String?> getPin(int port) async {
       var OperStatus = element.value["OperStatus"];
       var IfType = element.value["IfType"];
 
-      if (OperStatus == IfOperStatusUp &&
-          (IfType == IF_TYPE_ETHERNET_CSMACD || IfType == IF_TYPE_IEEE80211)) {
-        return true;
-      }
-      return false;
+      return OperStatus == IfOperStatusUp &&
+          (IfType == IF_TYPE_ETHERNET_CSMACD || IfType == IF_TYPE_IEEE80211);
     }).first;
     ip = List<String>.from(info.value["UnicastAddress"]?["AF_INET"] ?? [])
         .firstOrNull;
-    gateway =
-        List<String>.from(info.value["GatewayAddress"]?["AF_INET"] ?? [])
-            .firstOrNull;
-  
+    gateway = List<String>.from(info.value["GatewayAddress"]?["AF_INET"] ?? [])
+        .firstOrNull;
   } else {
     final info = NetworkInfo();
     ip = await info.getWifiIP();
