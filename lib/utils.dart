@@ -23,7 +23,7 @@ extension IntExt on int {
   }
 }
 
-extension ListExt<T> on List<T> {
+extension ListExt<T> on Iterable<T> {
   T? get firstOrNull {
     if (length == 0) {
       return null;
@@ -41,13 +41,14 @@ Future<String?> getPin(int port) async {
     var info = infos.entries.where((element) {
       var OperStatus = element.value["OperStatus"];
       var IfType = element.value["IfType"];
-
+      var GatewayAddress = element.value["GatewayAddress"];
+      if (GatewayAddress == null) return false;
       return OperStatus == IfOperStatusUp &&
           (IfType == IF_TYPE_ETHERNET_CSMACD || IfType == IF_TYPE_IEEE80211);
-    }).first;
-    ip = List<String>.from(info.value["UnicastAddress"]?["AF_INET"] ?? [])
+    }).firstOrNull;
+    ip = List<String>.from(info?.value["UnicastAddress"]?["AF_INET"] ?? [])
         .firstOrNull;
-    gateway = List<String>.from(info.value["GatewayAddress"]?["AF_INET"] ?? [])
+    gateway = List<String>.from(info?.value["GatewayAddress"]?["AF_INET"] ?? [])
         .firstOrNull;
   } else {
     final info = NetworkInfo();
@@ -74,12 +75,31 @@ class HostPort {
   HostPort(this.ip, this.port);
 }
 
-Future<HostPort> getHostPort(String pin) async {
-  final info = NetworkInfo();
-  var ip = await info.getWifiIP();
-  var gateway = await info.getWifiGatewayIP();
-  ip!;
-  gateway!;
+Future<HostPort?> getHostPort(String pin) async {
+  String? ip, gateway;
+
+  if (Platform.isWindows) {
+    final infos = await NetworkInfoWindows().GetAdaptersInfo();
+    var info = infos.entries.where((element) {
+      var OperStatus = element.value["OperStatus"];
+      var IfType = element.value["IfType"];
+      var GatewayAddress = element.value["GatewayAddress"];
+      if (GatewayAddress == null) return false;
+
+      return OperStatus == IfOperStatusUp &&
+          (IfType == IF_TYPE_ETHERNET_CSMACD || IfType == IF_TYPE_IEEE80211);
+    }).firstOrNull;
+    ip = List<String>.from(info?.value["UnicastAddress"]?["AF_INET"] ?? [])
+        .firstOrNull;
+    gateway = List<String>.from(info?.value["GatewayAddress"]?["AF_INET"] ?? [])
+        .firstOrNull;
+  } else {
+    final info = NetworkInfo();
+    ip = await info.getWifiIP();
+    gateway = await info.getWifiGatewayIP();
+  }
+  if (ip == null || gateway == null) return null;
+
   // print(ip);
   var port = pin.substring(pin.length - 4, pin.length);
   // print(port);

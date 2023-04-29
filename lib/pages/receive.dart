@@ -122,6 +122,7 @@ class _PageForReceiveState extends State<PageForReceive> {
 
   void _downloadHandler(File file) async {
     var hostPort = await getHostPort(pin);
+    if (hostPort == null) return;
     var ip = hostPort.ip;
     var port = hostPort.port;
     var url = "http://$ip:$port/file/${file.id}";
@@ -136,10 +137,10 @@ class _PageForReceiveState extends State<PageForReceive> {
     );
   }
 
-
   void _getFiles() async {
     if (_pinValidator(pin) != null) return;
     var hostPort = await getHostPort(pin);
+    if (hostPort == null) return;
     try {
       files =
           (await Client().files(hostPort.ip, hostPort.port)).values.toList();
