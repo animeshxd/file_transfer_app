@@ -1,4 +1,4 @@
-package com.example.file_ui
+package com.example.file_transfer_app
 
 import io.flutter.embedding.android.FlutterActivity
 

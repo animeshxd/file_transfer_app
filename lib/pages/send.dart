@@ -3,8 +3,8 @@ import 'dart:math';
 
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_ui/server.dart';
-import 'package:file_ui/utils.dart';
+import 'package:file_transfer_app/server.dart';
+import 'package:file_transfer_app/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 

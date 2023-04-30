@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_ui/pages/receive.dart';
-import 'package:file_ui/pages/send.dart';
-import 'package:file_ui/utils.dart';
+import 'package:file_transfer_app/pages/receive.dart';
+import 'package:file_transfer_app/pages/send.dart';
+import 'package:file_transfer_app/utils.dart';
 import 'package:flutter/material.dart';
 
 import 'server.dart';

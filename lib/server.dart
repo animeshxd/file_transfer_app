@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'package:file_ui/model/file.dart';
+import 'package:file_transfer_app/model/file.dart';
 import 'package:mime/mime.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as sio;
