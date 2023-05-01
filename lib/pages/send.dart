@@ -15,8 +15,7 @@ List<File> files = [];
 String pin = "";
 
 class PageForSend extends StatefulWidget {
-  final Server server;
-  const PageForSend({super.key, required this.server});
+  const PageForSend({super.key});
 
   @override
   State<PageForSend> createState() => _PageForSendState();
@@ -26,18 +25,19 @@ class _PageForSendState extends State<PageForSend> {
   bool _dragging = false;
   bool _loadingFile = false;
   bool _sending = false;
+  final Server server = Server();
 
   @override
   void initState() {
     super.initState();
-    _sending = widget.server.started;
-    _updateServerFiles(widget.server, files);
+    _sending = server.started;
+    _updateServerFiles(server, files);
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    _updateServerFiles(widget.server, files);
+    _updateServerFiles(server, files);
 
     return DropTarget(
       onDragDone: _onFileDropped,
@@ -133,7 +133,6 @@ class _PageForSendState extends State<PageForSend> {
   int get _getRandomPort => Random().nextInt(1111) + 8888;
 
   void _startOrStopServer() async {
-    var server = widget.server;
     _sending = server.started;
     pin = "";
     if (_sending) {
@@ -141,7 +140,7 @@ class _PageForSendState extends State<PageForSend> {
     } else {
       var port = _getRandomPort;
       pin = (await getPin(port)) ?? "";
-      _updateServerFiles(widget.server, files);
+      _updateServerFiles(server, files);
       await server.serve(port: port);
     }
     _trySetState(() => _sending = server.started);
@@ -161,7 +160,7 @@ class _PageForSendState extends State<PageForSend> {
               .toList() ??
           [],
     );
-    _updateServerFiles(widget.server, files);
+    _updateServerFiles(server, files);
     _trySetState();
   }
 
@@ -195,7 +194,7 @@ class _PageForSendState extends State<PageForSend> {
         return;
       }
     }
-    _updateServerFiles(widget.server, files);
+    _updateServerFiles(server, files);
     _trySetState();
   }
 

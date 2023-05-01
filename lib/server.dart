@@ -3,18 +3,23 @@ import 'dart:io' as io;
 
 import 'package:file_transfer_app/model/file.dart';
 import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as sio;
 import 'package:shelf_router/shelf_router.dart';
-import 'package:path/path.dart' as p;
 
 class Server {
+  static final instance = Server._();
+  factory Server() {
+    return instance;
+  }
+
   bool started = false;
   var app = Router();
   io.HttpServer? _server;
   Map<String, File> files = {};
 
-  Server() {
+  Server._() {
     app
       ..get('/file/<id>', _getFile)
       ..get('/files', _getFiles);

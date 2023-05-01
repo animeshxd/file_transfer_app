@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
           if (snapshot.data == false) {
             return showAskForNetwork;
           }
-          return [PageForSend(server: server), const PageForReceive()][current];
+          return [const PageForSend(), const PageForReceive()][current];
         },
       ),
     );
