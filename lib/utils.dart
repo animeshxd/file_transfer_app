@@ -75,7 +75,7 @@ class HostPort {
   HostPort(this.ip, this.port);
 }
 
-Future<HostPort?> getHostPort(String pin) async {
+Future<HostPort?> getHostPort(String pin, bool useGateway) async {
   String? ip, gateway;
 
   if (Platform.isWindows) {
@@ -102,6 +102,9 @@ Future<HostPort?> getHostPort(String pin) async {
 
   // print(ip);
   var port = pin.substring(pin.length - 4, pin.length);
+  if (useGateway) {
+    return HostPort(gateway, int.parse(port));
+  }
   // print(port);
   var ip0 = ip.split('.');
   var gateway0 = gateway.split('.');

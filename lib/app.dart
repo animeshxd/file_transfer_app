@@ -35,6 +35,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int current = 0;
   var server = Server();
+  bool useTethering = false;
 
   StreamSubscription<ConnectivityResult>? connectionSubscription;
 
@@ -55,6 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var body = [
+      PageForSend(
+        useTethering: useTethering,
+      ),
+      const PageForReceive()
+    ];
     return Scaffold(
       appBar: AppBar(
         title: const Text("File Transfer"),
@@ -72,10 +79,10 @@ class _MyHomePageState extends State<MyHomePage> {
         future: checkForWifi(),
         initialData: false,
         builder: (context, snapshot) {
-          if (snapshot.data == false) {
+          if (snapshot.data == false && useTethering != true) {
             return showAskForNetwork;
           }
-          return [const PageForSend(), const PageForReceive()][current];
+          return body[current];
         },
       ),
     );
@@ -89,6 +96,14 @@ class _MyHomePageState extends State<MyHomePage> {
         TextButton(
           onPressed: () => setState(() {}),
           child: const Text("OK"),
+        ),
+        TextButton(
+          onPressed: () => setState(
+            () {
+              useTethering = true;
+            },
+          ),
+          child: const Text("I will use tethering"),
         )
       ],
     );

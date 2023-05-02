@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../widgets/adaptive_button.dart';
+import '../widgets/yes_no_button.dart';
 
 class PageForReceive extends StatefulWidget {
   const PageForReceive({super.key});
@@ -26,6 +27,7 @@ var _serverFound = ServerFoundState.NOTFOUND;
 
 class _PageForReceiveState extends State<PageForReceive> {
   final _formKey = GlobalKey<FormState>();
+  bool _useGateway = false;
   @override
   void initState() {
     super.initState();
@@ -82,6 +84,20 @@ class _PageForReceiveState extends State<PageForReceive> {
             )
           ],
         ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 10, 2, 2),
+          child: Row(
+            children: [
+              const Text("use gateway?"),
+              YesNoButton(
+                value: _useGateway,
+                onChanged: (value) async => setState(() {
+                  _useGateway = value;
+                }),
+              )
+            ],
+          ),
+        ),
         Expanded(
           child: RefreshIndicator(
             onRefresh: () async => _getFiles(),
@@ -121,7 +137,7 @@ class _PageForReceiveState extends State<PageForReceive> {
   }
 
   void _downloadHandler(File file) async {
-    var hostPort = await getHostPort(pin);
+    var hostPort = await getHostPort(pin, _useGateway);
     if (hostPort == null) return;
     var ip = hostPort.ip;
     var port = hostPort.port;
@@ -139,7 +155,7 @@ class _PageForReceiveState extends State<PageForReceive> {
 
   void _getFiles() async {
     if (_pinValidator(pin) != null) return;
-    var hostPort = await getHostPort(pin);
+    var hostPort = await getHostPort(pin, _useGateway);
     if (hostPort == null) return;
     try {
       files =
@@ -156,6 +172,7 @@ class _PageForReceiveState extends State<PageForReceive> {
 
   String? _pinValidator(value) {
     if (value == null || value.isEmpty) return '';
+    if (_useGateway && value.length == 4) return null;
     if (value.length < 5 || !RegExp(r'\d+').hasMatch(value)) {
       return "invalid pin";
     }

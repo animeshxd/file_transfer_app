@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'dart:math';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_transfer_app/server.dart';
@@ -15,7 +16,8 @@ List<File> files = [];
 String pin = "";
 
 class PageForSend extends StatefulWidget {
-  const PageForSend({super.key});
+  final bool useTethering;
+  const PageForSend({super.key, required this.useTethering});
 
   @override
   State<PageForSend> createState() => _PageForSendState();
@@ -139,11 +141,21 @@ class _PageForSendState extends State<PageForSend> {
       await server.stop();
     } else {
       var port = _getRandomPort;
-      pin = (await getPin(port)) ?? "";
+      await _setPin(port);
       _updateServerFiles(server, files);
       await server.serve(port: port);
     }
     _trySetState(() => _sending = server.started);
+  }
+
+  Future<void> _setPin(int port) async {
+    var connectivity = await Connectivity().checkConnectivity();
+    if (connectivity == ConnectivityResult.wifi ||
+        connectivity == ConnectivityResult.ethernet) {
+      pin = (await getPin(port)) ?? "";
+    } else {
+      pin = port.toString();
+    }
   }
 
   void _selectFiles() async {
