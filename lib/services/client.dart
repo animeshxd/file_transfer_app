@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'model/file.dart';
+import '../model/file.dart';
 
 class Client {
   Future<Map<String, File>> files(String ip, int port) async {

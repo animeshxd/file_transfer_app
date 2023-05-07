@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:download_manager/download_manager.dart';
-import 'package:file_transfer_app/client.dart';
+import 'package:file_transfer_app/services/client.dart';
 import 'package:file_transfer_app/model/file.dart';
-import 'package:file_transfer_app/utils.dart';
+import 'package:file_transfer_app/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
