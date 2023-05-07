@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
-import 'package:file_transfer_app/model/file.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as sio;
 import 'package:shelf_router/shelf_router.dart';
+
+import '../model/file.dart';
 
 class Server {
   static final instance = Server._();

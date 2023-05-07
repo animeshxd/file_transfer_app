@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:download_manager/download_manager.dart';
-import 'package:file_transfer_app/services/client.dart';
-import 'package:file_transfer_app/model/file.dart';
-import 'package:file_transfer_app/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../model/file.dart';
+import '../services/client.dart';
+import '../services/utils.dart';
 import '../widgets/adaptive_button.dart';
 import '../widgets/yes_no_button.dart';
 

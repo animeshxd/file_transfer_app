@@ -4,12 +4,12 @@ import 'dart:math';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_transfer_app/services/server.dart';
-import 'package:file_transfer_app/services/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 import '../model/file.dart';
+import '../services/server.dart';
+import '../services/utils.dart';
 import '../widgets/adaptive_button.dart';
 
 List<File> files = [];

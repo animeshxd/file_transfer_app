@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:file_transfer_app/pages/receive.dart';
-import 'package:file_transfer_app/pages/send.dart';
-import 'package:file_transfer_app/services/utils.dart';
 import 'package:flutter/material.dart';
 
+import 'pages/receive.dart';
+import 'pages/send.dart';
 import 'services/server.dart';
+import 'services/utils.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
