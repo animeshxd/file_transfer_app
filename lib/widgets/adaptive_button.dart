@@ -10,14 +10,18 @@ class AdaptiveOutlinedIconButton extends StatelessWidget {
       {super.key,
       required this.onPressed,
       required this.icon,
-       this.label,
+      this.label,
       this.toolTip});
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     return width > 300
-        ? OutlinedButton.icon(onPressed: onPressed, icon: icon, label: label ?? Text(toolTip ?? ''))
+        ? OutlinedButton.icon(
+            onPressed: onPressed,
+            icon: icon,
+            label: label ?? Text(toolTip ?? ''),
+          )
         : IconButton(
             onPressed: onPressed,
             icon: icon,
