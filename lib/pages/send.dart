@@ -12,7 +12,7 @@ import '../services/server.dart';
 import '../services/utils.dart';
 import '../widgets/adaptive_button.dart';
 
-List<File> files = [];
+List<File> _files = [];
 String pin = "";
 
 class PageForSend extends StatefulWidget {
@@ -33,13 +33,13 @@ class _PageForSendState extends State<PageForSend> {
   void initState() {
     super.initState();
     _sending = server.started;
-    _updateServerFiles(server, files);
+    _updateServerFiles(server, _files);
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
-    _updateServerFiles(server, files);
+    _updateServerFiles(server, _files);
 
     return DropTarget(
       onDragDone: _onFileDropped,
@@ -94,14 +94,14 @@ class _PageForSendState extends State<PageForSend> {
                   ? Theme.of(context).primaryColor.withAlpha(20)
                   : Colors.transparent,
               child: ListView.builder(
-                itemCount: files.length,
+                itemCount: _files.length,
                 itemBuilder: (context, index) {
-                  var file = files[index];
+                  var file = _files[index];
                   return Dismissible(
                     key: Key('${file.path}'),
                     direction: DismissDirection.startToEnd,
                     onDismissed: (direction) {
-                      _trySetState(() => files.removeAt(index));
+                      _trySetState(() => _files.removeAt(index));
                     },
                     background: Container(
                       color: Colors.red,
@@ -142,7 +142,7 @@ class _PageForSendState extends State<PageForSend> {
     } else {
       var port = _getRandomPort;
       await _setPin(port);
-      _updateServerFiles(server, files);
+      _updateServerFiles(server, _files);
       await server.serve(port: port);
     }
     _trySetState(() => _sending = server.started);
@@ -166,13 +166,13 @@ class _PageForSendState extends State<PageForSend> {
         _trySetState();
       },
     );
-    files.addAll(
+    _files.addAll(
       result?.files
               .map((e) => File(name: e.name, size: e.size, path: e.path))
               .toList() ??
           [],
     );
-    _updateServerFiles(server, files);
+    _updateServerFiles(server, _files);
     _trySetState();
   }
 
@@ -195,7 +195,7 @@ class _PageForSendState extends State<PageForSend> {
   void _onFileDropped(DropDoneDetails details) async {
     for (var file in details.files) {
       try {
-        files.add(
+        _files.add(
           File(
             name: file.name,
             size: await file.length(),
@@ -206,7 +206,7 @@ class _PageForSendState extends State<PageForSend> {
         return;
       }
     }
-    _updateServerFiles(server, files);
+    _updateServerFiles(server, _files);
     _trySetState();
   }
 
@@ -214,6 +214,6 @@ class _PageForSendState extends State<PageForSend> {
     if (io.Platform.isAndroid || io.Platform.isIOS) {
       await FilePicker.platform.clearTemporaryFiles();
     }
-    _trySetState(() => files.clear());
+    _trySetState(() => _files.clear());
   }
 }
