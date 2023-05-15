@@ -42,7 +42,7 @@ class _PageForSendState extends State<PageForSend> {
     _updateServerFiles(server, _files);
 
     return DropTarget(
-      onDragDone: _onFileDropped,
+      onDragDone: (details) => _onFileDropped(details.files),
       onDragEntered: (details) => setState(() => _dragging = true),
       onDragExited: (details) => setState(() => _dragging = false),
       child: Column(
@@ -192,8 +192,8 @@ class _PageForSendState extends State<PageForSend> {
     }
   }
 
-  void _onFileDropped(DropDoneDetails details) async {
-    for (var file in details.files) {
+  void _onFileDropped(List files) async {
+    for (var file in files) {
       try {
         _files.add(
           File(
