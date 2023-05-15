@@ -27,7 +27,7 @@ var _serverFound = ServerFoundState.NOTFOUND;
 
 class _PageForReceiveState extends State<PageForReceive> {
   final _formKey = GlobalKey<FormState>();
-  bool _useGateway = false;
+  static bool _useGateway = false;
   @override
   void initState() {
     super.initState();
