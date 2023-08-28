@@ -37,6 +37,7 @@ class _MyHomePageState extends State<MyHomePage> {
   var server = Server();
 
   StreamSubscription<ConnectivityResult>? connectionSubscription;
+  var mainContent = const [PageForSend(), PageForReceive()];
 
   @override
   void dispose() async {
@@ -55,29 +56,65 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isWideScreen = MediaQuery.of(context).size.width > 640;
     return Scaffold(
       appBar: AppBar(
         title: const Text("File Transfer"),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.file_upload), label: 'send'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.file_download), label: 'receive')
-        ],
-        currentIndex: current,
-        onTap: (value) => setState(() => current = value),
-      ),
+      bottomNavigationBar: !isWideScreen
+          ? BottomNavigationBar(
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.file_upload),
+                  label: 'send',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.file_download),
+                  label: 'receive',
+                )
+              ],
+              currentIndex: current,
+              onTap: (value) => setState(() => current = value),
+            )
+          : null,
       body: FutureBuilder<bool>(
         future: checkForWifi(),
         initialData: false,
         builder: (context, snapshot) {
-          if (snapshot.data == false) {
+          bool haveNetwork = snapshot.data == true;
+          if (isWideScreen) {
+            return navigationRailwithContent(current, haveNetwork);
+          }
+          if (!haveNetwork) {
             return showAskForNetwork;
           }
-          return [const PageForSend(), const PageForReceive()][current];
+          return mainContent[current];
         },
       ),
+    );
+  }
+
+  Widget navigationRailwithContent(int current, bool hasNetwork) {
+    return Row(
+      children: [
+        NavigationRail(
+          labelType: NavigationRailLabelType.all,
+          destinations: const [
+            NavigationRailDestination(
+              icon: Icon(Icons.file_upload),
+              label: Text('send'),
+            ),
+            NavigationRailDestination(
+              icon: Icon(Icons.file_download),
+              label: Text('receive'),
+            ),
+          ],
+          selectedIndex: current,
+          onDestinationSelected: (value) =>
+              setState(() => this.current = value),
+        ),
+        Expanded(child: hasNetwork ? mainContent[current] : showAskForNetwork)
+      ],
     );
   }
 
